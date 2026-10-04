@@ -1,12 +1,8 @@
-# =========================================================
-
-# Stage 1 - Build Angular application
-
-# =========================================================
-
 FROM node:20 AS node
 
 WORKDIR /app
+
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 COPY package*.json ./
 
@@ -16,23 +12,16 @@ COPY . .
 
 RUN npm run build -- --configuration production
 
-# =========================================================
+# Verify Angular generated the expected output
 
-# Stage 2 - NGINX
-
-# =========================================================
+RUN echo "===== Angular build output =====" && 
+find /app/dist -maxdepth 3 -type f | sort
 
 FROM nginx:alpine
 
-# Remove default NGINX configuration
-
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy custom Angular SPA NGINX configuration
+RUN rm -f /etc/nginx/conf.d/default.conf
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Angular build output
 
 COPY --from=node /app/dist/angular-app/ /usr/share/nginx/html/
 
