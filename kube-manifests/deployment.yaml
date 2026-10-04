@@ -12,8 +12,6 @@ spec:
       labels:
         app: angular
     spec:
-      imagePullSecrets:
-        - name: staging-aksdeopsacr-secret
       containers:
         - name: angular
           image: aksdeopsacr.azurecr.io/angularapp01:#{Build.BuildId}#
