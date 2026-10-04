@@ -20,18 +20,13 @@ COPY package*.json ./
 
 RUN npm ci
 
-# Copy Angular source
+# Copy Angular application
 
 COPY . .
 
 # Build Angular application
 
 RUN npm run build -- --configuration production
-
-# Verify Angular build output
-
-RUN echo "===== Angular build output =====" && 
-find /app/dist -maxdepth 3 -type f | sort
 
 # =========================================================
 
@@ -45,18 +40,19 @@ FROM nginx:alpine
 
 RUN rm -f /etc/nginx/conf.d/default.conf
 
-# Copy Angular SPA NGINX configuration
+# Copy custom Angular SPA NGINX configuration
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Angular outputPath from angular.json:
+# angular.json:
 
-# dist/angular-app
+# "outputPath": "dist/angular-app"
 
 COPY --from=node /app/dist/angular-app/ /usr/share/nginx/html/
 
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
+
 
 
